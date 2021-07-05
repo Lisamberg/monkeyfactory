@@ -29,7 +29,7 @@ describe('AppController', () => {
 
     it('should return our WrongDateException', () => {
       expect(() =>
-        appService.getMinMaxTemperatureForParis('cccc'),
+        appService.getMinMaxTemperatureForParis('fsftgx'),
       ).toThrowError(WrongDateException);
     });
 
@@ -59,15 +59,19 @@ describe('AppController', () => {
     });
 
     it('should return invalid date exception', () => {
-      expect( () => appService.convertArabDateToRomanDate(moment('07/2021', "DD/MM/YYYY").toDate())).toThrowError(WrongDateException);
+      expect( () => appService.convertArabDateToRomanDate(moment('07/2021', "DD/MM/YYYY"))).toThrowError(WrongDateException);
     });
 
     it('should return roman date', () => {
-      expect(appService.convertArabDateToRomanDate(moment('04/07/2021', "DD/MM/YYYY").toDate())).toBe('IV/VII/MMXXI');
+      expect( () => appService.convertArabDateToRomanDate(moment('00/00/2021', "DD/MM/YYYY"))).toThrowError(WrongDateException);
     });
 
     it('should return roman date', () => {
-      expect(appService.convertArabDateToRomanDate(moment('12/12/2021', "DD/MM/YYYY").toDate())).toBe('XII/XII/MMXXI');
+      expect(appService.convertArabDateToRomanDate(moment('04/07/2021', "DD/MM/YYYY"))).toBe('IV/VII/MMXXI');
+    });
+
+    it('should return roman date', () => {
+      expect(appService.convertArabDateToRomanDate(moment('12/12/2021', "DD/MM/YYYY"))).toBe('XII/XII/MMXXI');
     });
 
   });
