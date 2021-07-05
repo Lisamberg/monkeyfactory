@@ -42,7 +42,7 @@ export class AppService {
   }
 
   /**
-   * break digit 
+   * break digit according to roman mapping
    * ex: 555 : 500, 50, 5
    * @param digit 
    * @returns 
