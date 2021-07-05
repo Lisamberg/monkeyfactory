@@ -54,7 +54,6 @@ export class AppService {
 
     for (const subscractible of Substractibles.allSubstractibles) {
       if (digitCopy - subscractible.getArabValue() >= 0) {
-        //Pas de while ici ?
         decomposedArabDigit.push(subscractible.getArabValue());
         digitCopy -= subscractible.getArabValue();
       }
