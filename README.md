@@ -28,6 +28,7 @@ The REST API is described below.
 ## Get Roman date and Paris min/max temp weather data
 
 ### Request
+host: localhost:3000
 
 `GET /?date='06/07/2021'`
 
