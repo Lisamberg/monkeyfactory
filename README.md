@@ -25,7 +25,7 @@ $ npm run test
 
 The REST API is described below.
 
-## Get list of Things
+## Get Roman date and Paris min/max temp weather data
 
 ### Request
 
