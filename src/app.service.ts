@@ -1,30 +1,54 @@
+/* eslint-disable @typescript-eslint/no-inferrable-types */
 /* eslint-disable prettier/prettier */
-import { Injectable } from '@nestjs/common';
+import { HttpService, Injectable } from '@nestjs/common';
 import { WrongDateException } from './exceptions/wrongDate.exception';
 import { RomanEnum } from './models/romanEnum.model';
 import { Substractibles } from './models/Substractibles.model';
 import * as moment from 'moment';
+import { Observable, } from 'rxjs';
+import { map } from 'rxjs/operators';
+import { MinMaxTempForParis } from './models/MixMaxTempForParis';
 
 @Injectable()
 export class AppService {
-  getHello(): string {
-    return 'Hello World!';
-  }
 
+  constructor(private readonly httpService: HttpService) {}
+  private readonly BASE_API_WEATHER_PARIS: string = "https://www.metaweather.com/api/location/615702/";
+  private readonly FORMAT_DATE_MOMENT: string = "DD/MM/YYYY";
+  
   /**
    * Convert Arab date to Roman Date
    * Call Weather API to get MIN/MAX Paris celcius temp for this date
-   * Weather data + roman date
+   * Return Paris Temp ° Weather data + roman date
    * Wrong string for date : throws Expt
+   * @param dateStr
+   * @returns Observable<string> 'roman date : Paris : Min: temp° -  Max: temp°'
    */
-  getMinMaxTemperatureForParis(dateStr: string): string {
-    const date: moment.Moment = moment(dateStr, "DD/MM/YYYY");
+  public getRomanDateFromStringAndParisTempWeatherData(dateStr: string): Observable<string> {
+    const date: moment.Moment = moment(dateStr, this.FORMAT_DATE_MOMENT);
 
     if (!date.isValid()) {
       throw new WrongDateException();
     }
     const romanDate: string = this.convertArabDateToRomanDate(date);
-    return 'conversion en cours ...';
+
+    return this.getParisWeatherMinMaxTemp(date).pipe(
+      map(minMaxTempForParis => `${romanDate} : Paris : Min: ${minMaxTempForParis.getMinTemp()}° -  Max: ${minMaxTempForParis.getMaxTemp()}°`)
+    )
+
+  }
+
+  /**
+   * Call the weather API to get informations such as min/maxtemp 
+   * Then create result Object
+   * @param date 
+   * @returns MinMaxTempForParis
+   */
+  public getParisWeatherMinMaxTemp(date: moment.Moment): Observable<MinMaxTempForParis> {
+    return this.httpService.get(`${this.BASE_API_WEATHER_PARIS}${date.year()}/${date.month() + 1}/${date.date()}`)
+    .pipe(
+      map(resp => new MinMaxTempForParis(resp.data[0]['max_temp'], resp.data[0]['min_temp']) )
+    )
   }
 
   /**
@@ -65,7 +89,7 @@ export class AppService {
    * Return roman list from arab list 
    * Ex: [10, 2] : [X, II]
    * @param arabDigits 
-   * @returns 
+   * @returns RomanEnum[]
    */
      public fromDecomposedArabDigitToListOfRoman(
       arabDigits: number[],
@@ -79,7 +103,9 @@ export class AppService {
 
   /**
    * Convert date array number to roman string date 
-   * [d,m,y] : 'x/xl/m' 
+   * [d,m,y] : 'x/xl/m'
+   * @param digitsDayMonthYear 
+   * @returns string 
    */
   public converterArabDigitsToRoman(digitsDayMonthYear: number[]): string {
     return digitsDayMonthYear

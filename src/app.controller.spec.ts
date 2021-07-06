@@ -5,6 +5,7 @@ import { AppService } from './app.service';
 import { WrongDateException } from './exceptions/wrongDate.exception';
 import { RomanEnum } from './models/romanEnum.model';
 import * as moment from 'moment';
+import { HttpModule } from '@nestjs/common';
 
 describe('AppController', () => {
   let appController: AppController;
@@ -12,6 +13,7 @@ describe('AppController', () => {
 
   beforeEach(async () => {
     const app: TestingModule = await Test.createTestingModule({
+      imports: [HttpModule],
       controllers: [AppController],
       providers: [AppService],
     }).compile();
@@ -21,15 +23,15 @@ describe('AppController', () => {
   });
 
   describe('root', () => {
-    it('should return "conversion en cours ..."', () => {
-      expect(appService.getMinMaxTemperatureForParis('02/07/2021')).toBe(
-        'conversion en cours ...',
-      );
+    it('should return string contain "II/VII/MMXXI"', () => {
+      appService.getRomanDateFromStringAndParisTempWeatherData('02/07/2021').subscribe(data => {
+          expect(data).toContain("II/VII/MMXXI");
+      });
     });
 
     it('should return our WrongDateException', () => {
       expect(() =>
-        appService.getMinMaxTemperatureForParis('fsftgx'),
+        appService.getRomanDateFromStringAndParisTempWeatherData('fsftgx'),
       ).toThrowError(WrongDateException);
     });
 
@@ -62,7 +64,7 @@ describe('AppController', () => {
       expect( () => appService.convertArabDateToRomanDate(moment('07/2021', "DD/MM/YYYY"))).toThrowError(WrongDateException);
     });
 
-    it('should return roman date', () => {
+    it('should return invalid date exception', () => {
       expect( () => appService.convertArabDateToRomanDate(moment('00/00/2021', "DD/MM/YYYY"))).toThrowError(WrongDateException);
     });
 
@@ -73,6 +75,5 @@ describe('AppController', () => {
     it('should return roman date', () => {
       expect(appService.convertArabDateToRomanDate(moment('12/12/2021', "DD/MM/YYYY"))).toBe('XII/XII/MMXXI');
     });
-
   });
 });
