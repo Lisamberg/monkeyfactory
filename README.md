@@ -1,4 +1,4 @@
-# REST API example application
+# REST API MonkeyFactory test
 This is the REST API for MonkeyFactory =)
 
 ## Installation
